@@ -7,18 +7,18 @@
     <div class="col-md-12 mb-4">
         <div class="card">
             <div class="card-header">
-                <h4>Cliente: {{ cliente.apeynom }}</h4>
+               <h4>Cliente: <span id="cliente_nombre">{{ cliente.apeynom }}</span></h4>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
                         <p><strong>Dirección:</strong> {{ cliente.direccion }}</p>
                         <p><strong>Localidad:</strong> {{ cliente.localidad }}</p>
-                        <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+                        <p>Teléfono: <span id="cliente_telefono">{{ cliente.telefono }}</span></p>
                     </div>
                     <div class="col-md-6">
                         <p><strong>Aseguradora:</strong> {{ cliente.aseguradora }}</p>
-                        <p><strong>Email:</strong> {{ cliente.email }}</p>
+                        <p>Email: <span id="cliente_email">{{ cliente.email }}</span></p>
                     </div>
                 </div>
             </div>
@@ -37,17 +37,17 @@
                     
                     <div class="mb-3">
                         <label for="marca" class="form-label">Marca:</label>
-                        <input type="text" class="form-control" name="marca" id="marca" required>
+                        <input type="text" class="form-control uppercase" name="marca" id="marca" required>
                     </div>
                     
                     <div class="row">
                         <div class="col-md-7 mb-3">
                             <label for="modelo" class="form-label">Modelo:</label>
-                            <input type="text" class="form-control" name="modelo" id="modelo" required>
+                            <input type="text" class="form-control uppercase" name="modelo" id="modelo" required>
                         </div>
                         <div class="col-md-5 mb-3">
                             <label for="patente" class="form-label">Patente:</label>
-                            <input type="text" class="form-control" name="patente" id="patente" required>
+                            <input type="text" class="form-control uppercase" name="patente" id="patente" required>
                         </div>
                     </div>
 
@@ -90,7 +90,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="importe" class="form-label">Importe:</label>
-                        <input type="number" class="form-control" name="importe" id="importe" step="0.01" min="0" required>
+                        <input type="number" class="form-control" name="importe" id="importe" step="1000" min="0" required>
                     </div>
                     
                     <button type="submit" class="btn btn-success">Agregar Item</button>
@@ -104,11 +104,12 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5>Items del Presupuesto</h5>
+                <button class="btn btn-primary mt-3" onclick="imprimirPresupuesto()">Imprimir</button>
                 <div id="totalPresupuesto" class="h5 mb-0 text-primary">$0.00</div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped table-sm">
+                    <table id="grilla_items" class="table table-striped table-sm">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
@@ -378,5 +379,66 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function imprimirPresupuesto() {
+    const clienteNombre = document.getElementById("cliente_nombre").textContent;
+    const clienteTelefono = document.getElementById("cliente_telefono").textContent;
+    const clienteEmail = document.getElementById("cliente_email").textContent;
+    const totalPresupuesto = document.getElementById("totalPresupuesto").textContent;
+
+    const tablaOriginal = document.getElementById("grilla_items");
+    const tablaClon = tablaOriginal.cloneNode(true);
+
+    // Eliminar la columna de "Acciones"
+    tablaClon.querySelectorAll("tr").forEach(row => {
+        if (row.cells.length > 0) {
+            row.deleteCell(-1);
+        }
+    });
+
+    // Agregar fila de Total al final del tbody
+    const nuevaFila = tablaClon.insertRow();
+    const totalColumnas = tablaClon.rows[0].cells.length;
+    const celdaLabel = nuevaFila.insertCell(0);
+    celdaLabel.colSpan = totalColumnas - 1;
+    celdaLabel.textContent = "TOTAL:";
+    celdaLabel.style.fontWeight = "bold";
+
+    const celdaTotal = nuevaFila.insertCell(1);
+    celdaTotal.textContent = "$" + totalPresupuesto;
+    celdaTotal.style.fontWeight = "bold";
+
+    const grillaHTML = tablaClon.innerHTML;
+
+    const ventana = window.open('', '_blank');
+    ventana.document.write(`
+        <html>
+        <head>
+            <title>Presupuesto</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .logo { width: 150px; }
+                h2, h4 { margin-bottom: 5px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                table, th, td { border: 1px solid black; }
+                th, td { padding: 8px; text-align: left; }
+            </style>
+        </head>
+        <body>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <img src="/static/images/logo_cira.png" alt="Logo CIRA" class="logo">
+                <h2 style="margin: 0;">Presupuesto</h2>
+            </div>
+            <hr style="margin: 15px 0; border: 1px solid #000;">
+            <h4>Cliente: ${clienteNombre}</h4>
+            <h4>Teléfono: ${clienteTelefono}</h4>
+            <h4>Email: ${clienteEmail}</h4>
+            <h4>Fecha: ${new Date().toLocaleDateString()}</h4>
+            <table>${grillaHTML}</table>
+        </body>
+        </html>
+    `);
+    ventana.document.close();
+    ventana.print();
+}
 </script>
 {% endblock %}

@@ -219,8 +219,17 @@ def generar_html_presupuesto(cliente_nombre, patente, fecha, items, total):
         </style>
     </head>
     <body>
-        <div class="header">
-            <h1>PRESUPUESTO AUTOMOTOR</h1>
+        <div class="header" style="background-color: #007bff; color: white; padding: 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="width: 100%;">
+                <tr>
+                    <td style="width: 100px;">
+                        <img src="cid:logo_cira" alt="Logo CIRA" style="width: 200px;">
+                    </td>
+                    <td style="text-align: left;">
+                        <h5 style="margin: 0; font-size: 24px;">PRESUPUESTO AUTOMOTOR</h5>
+                    </td>
+                </tr>
+            </table>
         </div>
         
         <div class="content">
@@ -254,25 +263,37 @@ def generar_html_presupuesto(cliente_nombre, patente, fecha, items, total):
     """
     return html
 
+from email.mime.image import MIMEImage
+
 def enviar_presupuesto_email(cliente_email, cliente_nombre, patente, fecha, items, total):
-    """Envía el presupuesto por email"""
+    """Envía el presupuesto por email con imagen embebida"""
     try:
-        msg = MIMEMultipart('alternative')
+        msg = MIMEMultipart('related')
         msg['Subject'] = f'Presupuesto - {patente} - {fecha}'
         msg['From'] = EMAIL_CONFIG['email']
         msg['To'] = cliente_email
-        
+
+        msg_alternative = MIMEMultipart('alternative')
+        msg.attach(msg_alternative)
+
         html_content = generar_html_presupuesto(cliente_nombre, patente, fecha, items, total)
         parte_html = MIMEText(html_content, 'html', 'utf-8')
-        msg.attach(parte_html)
-        
+        msg_alternative.attach(parte_html)
+
+        # Ruta al logo
+        with open('static/images/logo_cira.png', 'rb') as f:
+            img = MIMEImage(f.read())
+            img.add_header('Content-ID', '<logo_cira>')
+            img.add_header('Content-Disposition', 'inline', filename='logo_cira.png')
+            msg.attach(img)
+
         with smtplib.SMTP(EMAIL_CONFIG['smtp_server'], EMAIL_CONFIG['smtp_port']) as server:
             server.starttls()
             server.login(EMAIL_CONFIG['email'], EMAIL_CONFIG['password'])
             server.send_message(msg)
-        
+
         return True, "Email enviado correctamente"
-    
+
     except Exception as e:
         logger.error(f"Error enviando email: {e}")
         return False, f"Error al enviar email: {str(e)}"

@@ -13,7 +13,7 @@
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <label for="apeynom" class="form-label">Apellido y Nombre del Cliente:</label>
-                        <input type="text" class="form-control" id="apeynom" placeholder="Ingrese apellido y nombre">
+                        <input type="text" class="form-control uppercase" id="apeynom" placeholder="Ingrese apellido y nombre">
                     </div>
                     <div class="col-md-6 d-flex align-items-end">
                         <button type="button" class="btn btn-primary" onclick="buscarPresupuestos()" style="margin-top:10px">
@@ -183,6 +183,8 @@ function mostrarPresupuestos(presupuestos) {
                                 ${!clienteActual.email ? 'disabled title="Cliente sin email"' : ''}>
                             <i class="fas fa-envelope"></i> Enviar por Email
                         </button>
+                        
+
                     </div>
                 </div>
                 <div class="card-body">
@@ -301,5 +303,7 @@ document.getElementById('apeynom').addEventListener('keypress', function(e) {
         buscarPresupuestos();
     }
 });
+
+ 
 </script>
 {% endblock %}
