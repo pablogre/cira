@@ -26,7 +26,7 @@
     </div>
     
     <!-- Formulario para agregar items -->
-    <div class="col-md-6">
+    <div class="col-md-5">
         <div class="card">
             <div class="card-header">
                 <h5>Agregar Item al Presupuesto</h5>
@@ -68,14 +68,33 @@
                             <label for="partes" class="form-label">Partes:</label>
                             <select class="form-select" name="partes" id="partes" required>
                                 <option value="">Seleccione...</option>
+                                <option value="Baúl / Tapa de baúl">Baúl / Tapa de baúl</option>
                                 <option value="Capot">Capot</option>
+                                <option value="Condesador">Condesador</option>
+                                <option value="Espejo Retrovisor">Espejo Retrovisor</option>
+                                <option value="Faro Trasero">Faro Trasero</option>
                                 <option value="Guardabarro Delantero">Guardabarro Delantero</option>
-                                <option value="Guardabarro Trasero">Guardabarro Trasero</option>
+                                <option value="Guardabarro trasero">Guardabarro Trasero</option>
+                                <option value="Guardapolvo Interno">Guardapolvo Interno</option>
+                                <option value="Manija de Puerta">Manija de Puerta</option>
+                                <option value="Óptica Delantera">Óptica Delantera</option>
+                                <option value="Paragolpes Delantero">Paragolpes Delantero</option>
+                                <option value="Paragolpes Trasero">Paragolpes Trasero</option>
+                                <option value="Parrilla Frontal">Parrilla Frontal</option>
+                                <option value="Pilar A">Pilar A</option>
+                                <option value="Pilar B">Pilar B</option>
+                                <option value="Pilar C">Pilar C</option>
+                                <option value="Portón trasero">Portón trasero</option>
                                 <option value="Puerta Delantera">Puerta Delantera</option>
                                 <option value="Puerta Trasera">Puerta Trasera</option>
-                                <option value="Baul">Baul</option>
+                                <option value="Radiador">Radiador</option>
+                                <option value="Rejilla Inferior de Paragolpes">Rejilla Inferior de Paragolpes</option>
+                                <option value="Rompe niebla Delantero">Rompe niebla Delantero</option>
+                                <option value="Rompe niebla Trasero">Rompe niebla Trasero</option>
                                 <option value="Socalo">Socalo</option>
-                                <option value="Piso">Piso</option>
+                                <option value="Tapa de Combustible">Tapa de Combustible</option>
+                                <option value="Techo">Techo</option>
+                                <option value="Zócalo">Zócalo</option>
                             </select>
                         </div>
                         
@@ -100,11 +119,11 @@
     </div>
     
     <!-- Grilla de presupuestos -->
-    <div class="col-md-6">
+    <div class="col-md-7">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5>Items del Presupuesto</h5>
-                <button class="btn btn-primary mt-3" onclick="imprimirPresupuesto()">Imprimir</button>
+                <button class="btn btn-secondary mt-3" onclick="imprimirPresupuesto()">Imprimir</button>
                 <div id="totalPresupuesto" class="h5 mb-0 text-primary">$0.00</div>
             </div>
             <div class="card-body">
