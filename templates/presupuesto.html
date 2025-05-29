@@ -40,15 +40,17 @@
                         <input type="text" class="form-control" name="marca" id="marca" required>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="modelo" class="form-label">Modelo:</label>
-                        <input type="text" class="form-control" name="modelo" id="modelo" required>
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            <label for="modelo" class="form-label">Modelo:</label>
+                            <input type="text" class="form-control" name="modelo" id="modelo" required>
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label for="patente" class="form-label">Patente:</label>
+                            <input type="text" class="form-control" name="patente" id="patente" required>
+                        </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="patente" class="form-label">Patente:</label>
-                        <input type="text" class="form-control" name="patente" id="patente" required>
-                    </div>
+
                     
                     <div class="mb-3">
                         <label for="accion" class="form-label">Acción:</label>
@@ -61,31 +63,31 @@
                             <option value="Pintar">Pintar</option>
                         </select>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="partes" class="form-label">Partes:</label>
-                        <select class="form-select" name="partes" id="partes" required>
-                            <option value="">Seleccione...</option>
-                            <option value="Capot">Capot</option>
-                            <option value="Guardabarro Delantero">Guardabarro Delantero</option>
-                            <option value="Guardabarro Trasero">Guardabarro Trasero</option>
-                            <option value="Puerta Delantera">Puerta Delantera</option>
-                            <option value="Puerta Trasera">Puerta Trasera</option>
-                            <option value="Baul">Baul</option>
-                            <option value="Socalo">Socalo</option>
-                            <option value="Piso">Piso</option>
-                        </select>
+                    <div class="row">
+                        <div class="col-md-6 mb-3"">
+                            <label for="partes" class="form-label">Partes:</label>
+                            <select class="form-select" name="partes" id="partes" required>
+                                <option value="">Seleccione...</option>
+                                <option value="Capot">Capot</option>
+                                <option value="Guardabarro Delantero">Guardabarro Delantero</option>
+                                <option value="Guardabarro Trasero">Guardabarro Trasero</option>
+                                <option value="Puerta Delantera">Puerta Delantera</option>
+                                <option value="Puerta Trasera">Puerta Trasera</option>
+                                <option value="Baul">Baul</option>
+                                <option value="Socalo">Socalo</option>
+                                <option value="Piso">Piso</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3"">
+                            <label for="lateral" class="form-label">Lateral:</label>
+                            <select class="form-select" name="lateral" id="lateral">
+                                <option value="">Seleccione...</option>
+                                <option value="Lateral Izquierdo/a">Lateral Izquierdo/a</option>
+                                <option value="Lateral Derecho/a">Lateral Derecho/a</option>
+                            </select>
+                        </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="lateral" class="form-label">Lateral:</label>
-                        <select class="form-select" name="lateral" id="lateral">
-                            <option value="">Seleccione...</option>
-                            <option value="Lateral Izquierdo/a">Lateral Izquierdo/a</option>
-                            <option value="Lateral Derecho/a">Lateral Derecho/a</option>
-                        </select>
-                    </div>
-                    
                     <div class="mb-3">
                         <label for="importe" class="form-label">Importe:</label>
                         <input type="number" class="form-control" name="importe" id="importe" step="0.01" min="0" required>

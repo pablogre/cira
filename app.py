@@ -48,8 +48,8 @@ def buscar_cliente(apeynom):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        query = "SELECT * FROM cliente WHERE apeynom = %s"
-        cursor.execute(query, (apeynom,))
+        query = "SELECT * FROM cliente WHERE apeynom LIKE %s"
+        cursor.execute(query, (f"%{apeynom}%",))
         cliente = cursor.fetchone()
         
         cursor.close()

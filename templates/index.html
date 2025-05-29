@@ -4,19 +4,9 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Nuevo Presupuesto</h5>
-            </div>
-            <div class="card-body">
-                <p>Crear un nuevo presupuesto para un cliente</p>
-                <!-- Tu formulario actual aquí -->
-            </div>
-        </div>
-    </div>
     
-    <div class="col-md-6">
+    
+    <div class="col-md-8 mx-auto"style="padding-bottom:10px">
         <div class="card">
             <div class="card-header">
                 <h5>Consultar Presupuestos</h5>
@@ -35,7 +25,7 @@
     <div class="col-md-8 mx-auto">
         <div class="card">
             <div class="card-header">
-                <h3>Datos del Cliente</h3>
+                <h5>Generar Presupuesto</h5>
             </div>
             <div class="card-body">
                 <form method="POST" action="/procesar_formulario" id="clienteForm">
@@ -79,12 +69,15 @@
     </div>
 </div>
 
-<script>
-function buscarCliente() {
+<script>function buscarCliente() {
     const apeynom = document.getElementById('apeynom').value;
     
     if (!apeynom) {
-        alert('Por favor ingrese el apellido y nombre');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Falta información',
+            text: 'Por favor ingrese el apellido y nombre',
+        });
         return;
     }
     
@@ -99,22 +92,38 @@ function buscarCliente() {
     .then(data => {
         if (data.encontrado) {
             // Llenar los campos con los datos del cliente
+            document.getElementById('apeynom').value = data.cliente.apeynom || '';
             document.getElementById('direccion').value = data.cliente.direccion || '';
             document.getElementById('localidad').value = data.cliente.localidad || '';
             document.getElementById('telefono').value = data.cliente.telefono || '';
             document.getElementById('aseguradora').value = data.cliente.aseguradora || '';
             document.getElementById('email').value = data.cliente.email || '';
             
-            alert('Cliente encontrado. Datos completados automáticamente.');
+            Swal.fire({
+                icon: 'success',
+                title: 'Cliente encontrado',
+                text: 'Datos completados automáticamente.',
+                timer: 2000,
+                showConfirmButton: false
+            });
         } else {
-            alert('Cliente no encontrado. Se creará un nuevo registro.');
+            Swal.fire({
+                icon: 'info',
+                title: 'Cliente no encontrado',
+                text: 'Se creará un nuevo registro.',
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error al buscar el cliente');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al buscar el cliente',
+        });
     });
 }
+
 </script>
 {% endblock %}
 
