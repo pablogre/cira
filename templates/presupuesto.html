@@ -1,0 +1,380 @@
+<!-- templates/presupuesto.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Información del Cliente -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4>Cliente: {{ cliente.apeynom }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Dirección:</strong> {{ cliente.direccion }}</p>
+                        <p><strong>Localidad:</strong> {{ cliente.localidad }}</p>
+                        <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Aseguradora:</strong> {{ cliente.aseguradora }}</p>
+                        <p><strong>Email:</strong> {{ cliente.email }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Formulario para agregar items -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Agregar Item al Presupuesto</h5>
+            </div>
+            <div class="card-body">
+                <form id="presupuestoForm">
+                    <input type="hidden" id="id_cli" name="id_cli" value="{{ cliente.id_cli }}">
+                    
+                    <div class="mb-3">
+                        <label for="marca" class="form-label">Marca:</label>
+                        <input type="text" class="form-control" name="marca" id="marca" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="modelo" class="form-label">Modelo:</label>
+                        <input type="text" class="form-control" name="modelo" id="modelo" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="patente" class="form-label">Patente:</label>
+                        <input type="text" class="form-control" name="patente" id="patente" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="accion" class="form-label">Acción:</label>
+                        <select class="form-select" name="accion" id="accion" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Desarrollar">Desarrollar</option>
+                            <option value="Desarrollar y Pintar">Desarrollar y Pintar</option>
+                            <option value="Cambiar">Cambiar</option>
+                            <option value="Cambiar y Pintar">Cambiar y Pintar</option>
+                            <option value="Pintar">Pintar</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="partes" class="form-label">Partes:</label>
+                        <select class="form-select" name="partes" id="partes" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Capot">Capot</option>
+                            <option value="Guardabarro Delantero">Guardabarro Delantero</option>
+                            <option value="Guardabarro Trasero">Guardabarro Trasero</option>
+                            <option value="Puerta Delantera">Puerta Delantera</option>
+                            <option value="Puerta Trasera">Puerta Trasera</option>
+                            <option value="Baul">Baul</option>
+                            <option value="Socalo">Socalo</option>
+                            <option value="Piso">Piso</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="lateral" class="form-label">Lateral:</label>
+                        <select class="form-select" name="lateral" id="lateral">
+                            <option value="">Seleccione...</option>
+                            <option value="Lateral Izquierdo/a">Lateral Izquierdo/a</option>
+                            <option value="Lateral Derecho/a">Lateral Derecho/a</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="importe" class="form-label">Importe:</label>
+                        <input type="number" class="form-control" name="importe" id="importe" step="0.01" min="0" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Agregar Item</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Grilla de presupuestos -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Items del Presupuesto</h5>
+                <div id="totalPresupuesto" class="h5 mb-0 text-primary">$0.00</div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Vehículo</th>
+                                <th>Parte</th>
+                                <th>Importe</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaPresupuestos">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">Ingrese una patente para ver los items del presupuesto.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="/" class="btn btn-secondary">Nuevo Cliente</a>
+    </div>
+</div>
+
+<!-- SweetAlert2 CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.min.css">
+
+<script>
+// Variables globales
+const clienteId = {{ cliente.id_cli }};
+let patenteActual = '';
+
+// Actualiza la tabla de presupuestos según la patente ingresada
+function actualizarPresupuestos() {
+    const patente = document.getElementById('patente').value.trim();
+
+    if (!patente) {
+        limpiarTabla();
+        return;
+    }
+
+    patenteActual = patente;
+    mostrarLoading();
+
+    fetch('/obtener_presupuestos', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            id_cli: clienteId,
+            patente: patente,
+            fecha: new Date().toISOString().split('T')[0]
+        })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error(`Error en la respuesta: ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        renderizarTabla(data.presupuestos, data.total);
+    })
+    .catch(error => {
+        console.error('Error al obtener presupuestos:', error);
+        mostrarErrorTabla('Error al cargar los presupuestos.');
+    });
+}
+
+function limpiarTabla() {
+    const tbody = document.getElementById('tablaPresupuestos');
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">
+        Ingrese una patente para ver los items del presupuesto.</td></tr>`;
+    actualizarTotal(0);
+    patenteActual = '';
+}
+
+function mostrarLoading() {
+    document.getElementById('tablaPresupuestos').innerHTML =
+        `<tr><td colspan="5" class="text-center">Cargando...</td></tr>`;
+}
+
+function mostrarErrorTabla(mensaje) {
+    const tbody = document.getElementById('tablaPresupuestos');
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">${mensaje}</td></tr>`;
+    actualizarTotal(0);
+}
+
+function renderizarTabla(presupuestos, total) {
+    const tbody = document.getElementById('tablaPresupuestos');
+    if (!presupuestos || presupuestos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">
+            No hay items para esta patente en la fecha actual.</td></tr>`;
+        actualizarTotal(0);
+        return;
+    }
+
+    let html = presupuestos.map(item => {
+        const fecha = new Date(item.fecha).toLocaleDateString('es-AR');
+        return `
+            <tr>
+                <td>${fecha}</td>
+                <td>${item.marca} ${item.modelo}<br><small class="text-muted">${item.patente}</small></td>
+                <td>${item.parte}</td>
+                <td>$${parseFloat(item.importe).toFixed(2)}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="eliminarItem(${item.id_presu})" title="Eliminar item">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>`;
+    }).join('');
+    tbody.innerHTML = html;
+    actualizarTotal(total);
+}
+
+function actualizarTotal(monto) {
+    document.getElementById('totalPresupuesto').textContent = `$${monto.toFixed(2)}`;
+}
+
+// Elimina un item con confirmación y actualización de la tabla
+function eliminarItem(id_presu) {
+    Swal.fire({
+        title: '¿Eliminar este item?',
+        text: "Esta acción no se puede deshacer",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        focusCancel: true
+    }).then(result => {
+        if (!result.isConfirmed) return;
+
+        Swal.fire({
+            title: 'Eliminando...',
+            text: 'Por favor espere',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        fetch('/eliminar_item', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ id_presu })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`Error en la respuesta: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Eliminado!',
+                    text: 'El item ha sido eliminado correctamente',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    confirmButtonColor: '#28a745'
+                });
+                actualizarPresupuestos();
+            } else {
+                throw new Error(data.error || 'Error desconocido');
+            }
+        })
+        .catch(error => {
+            console.error('Error al eliminar item:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `Error al eliminar el item: ${error.message}`,
+                confirmButtonColor: '#dc3545'
+            });
+        });
+    });
+}
+
+// Evento para agregar item
+function manejarEnvioFormulario(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const requiredFields = ['marca', 'modelo', 'patente', 'accion', 'partes', 'importe'];
+
+    for (let field of requiredFields) {
+        if (!formData.get(field) || formData.get(field).trim() === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campo requerido',
+                text: `El campo ${field} es obligatorio`,
+                confirmButtonColor: '#ffc107'
+            });
+            return;
+        }
+    }
+
+    const importe = parseFloat(formData.get('importe'));
+    if (isNaN(importe) || importe <= 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Importe inválido',
+            text: 'El importe debe ser un número mayor a 0',
+            confirmButtonColor: '#ffc107'
+        });
+        return;
+    }
+
+    Swal.fire({
+        title: 'Agregando item...',
+        text: 'Por favor espere',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    fetch('/agregar_item', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id_cli: document.getElementById("id_cli").value,
+            marca: document.getElementById("marca").value,
+            modelo: document.getElementById("modelo").value,
+            patente: document.getElementById("patente").value,
+            accion: document.getElementById("accion").value,
+            partes: document.getElementById("partes").value,
+            lateral: document.getElementById("lateral").value,
+            importe: document.getElementById("importe").value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Éxito', data.message, 'success');
+            // Actualiza tabla tras agregar
+            actualizarPresupuestos();
+            // Opcional: limpiar campos o reset form
+            document.getElementById("presupuestoForm").reset();
+        } else {
+            Swal.fire('Error', data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error al enviar el item:', error);
+        Swal.fire('Error', 'Ocurrió un error al enviar el item', 'error');
+    });
+}
+
+// Escuchar eventos después de cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    const patenteInput = document.getElementById('patente');
+    const form = document.getElementById('presupuestoForm');
+
+    if (patenteInput) {
+        patenteInput.addEventListener('input', () => {
+            if (patenteInput.value.trim() === '') limpiarTabla();
+        });
+        patenteInput.addEventListener('change', actualizarPresupuestos);
+        patenteInput.addEventListener('blur', actualizarPresupuestos);
+    }
+
+    if (form) {
+        form.addEventListener('submit', manejarEnvioFormulario);
+    }
+});
+
+</script>
+{% endblock %}

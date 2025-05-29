@@ -1,0 +1,120 @@
+<!-- templates/index.html -->
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Nuevo Presupuesto</h5>
+            </div>
+            <div class="card-body">
+                <p>Crear un nuevo presupuesto para un cliente</p>
+                <!-- Tu formulario actual aquí -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Consultar Presupuestos</h5>
+            </div>
+            <div class="card-body">
+                <p>Buscar y enviar presupuestos existentes por email</p>
+                <a href="/consultar_presupuestos" class="btn btn-info">
+                    <i class="fas fa-search"></i> Ir a Consultas
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h3>Datos del Cliente</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/procesar_formulario" id="clienteForm">
+                    <div class="mb-3">
+                        <label for="apeynom" class="form-label">Apellido y Nombre:</label>
+                        <input type="text" class="form-control" id="apeynom" name="apeynom" required>
+                        <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="buscarCliente()">
+                            Buscar Cliente
+                        </button>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="direccion" class="form-label">Dirección:</label>
+                        <input type="text" class="form-control" id="direccion" name="direccion" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="localidad" class="form-label">Localidad:</label>
+                        <input type="text" class="form-control" id="localidad" name="localidad" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="telefono" class="form-label">Teléfono:</label>
+                        <input type="text" class="form-control" id="telefono" name="telefono" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="aseguradora" class="form-label">Aseguradora:</label>
+                        <input type="text" class="form-control" id="aseguradora" name="aseguradora" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Continuar al Presupuesto</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function buscarCliente() {
+    const apeynom = document.getElementById('apeynom').value;
+    
+    if (!apeynom) {
+        alert('Por favor ingrese el apellido y nombre');
+        return;
+    }
+    
+    fetch('/buscar_cliente', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({apeynom: apeynom})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.encontrado) {
+            // Llenar los campos con los datos del cliente
+            document.getElementById('direccion').value = data.cliente.direccion || '';
+            document.getElementById('localidad').value = data.cliente.localidad || '';
+            document.getElementById('telefono').value = data.cliente.telefono || '';
+            document.getElementById('aseguradora').value = data.cliente.aseguradora || '';
+            document.getElementById('email').value = data.cliente.email || '';
+            
+            alert('Cliente encontrado. Datos completados automáticamente.');
+        } else {
+            alert('Cliente no encontrado. Se creará un nuevo registro.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al buscar el cliente');
+    });
+}
+</script>
+{% endblock %}
+

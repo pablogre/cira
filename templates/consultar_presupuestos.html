@@ -1,0 +1,305 @@
+<!-- templates/consultar_presupuestos.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>Consultar Presupuestos</h4>
+            </div>
+            <div class="card-body">
+                <!-- Formulario de búsqueda -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="apeynom" class="form-label">Apellido y Nombre del Cliente:</label>
+                        <input type="text" class="form-control" id="apeynom" placeholder="Ingrese apellido y nombre">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <button type="button" class="btn btn-primary" onclick="buscarPresupuestos()">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información del cliente (oculta inicialmente) -->
+<div class="row mt-4" id="clienteInfo" style="display: none;">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 id="clienteNombre"></h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Dirección:</strong> <span id="clienteDireccion"></span></p>
+                        <p><strong>Localidad:</strong> <span id="clienteLocalidad"></span></p>
+                        <p><strong>Teléfono:</strong> <span id="clienteTelefono"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Aseguradora:</strong> <span id="clienteAseguradora"></span></p>
+                        <p><strong>Email:</strong> <span id="clienteEmail"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de presupuestos (oculta inicialmente) -->
+<div class="row mt-4" id="presupuestosSection" style="display: none;">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Presupuestos Disponibles</h5>
+            </div>
+            <div class="card-body">
+                <div id="listaPresupuestos">
+                    <!-- Aquí se cargarán los presupuestos -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="/" class="btn btn-secondary">Volver al Inicio</a>
+    </div>
+</div>
+
+<!-- SweetAlert2 CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.min.css">
+
+<script>
+let clienteActual = null;
+
+function buscarPresupuestos() {
+    const apeynom = document.getElementById('apeynom').value.trim();
+    
+    if (!apeynom) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campo requerido',
+            text: 'Por favor ingrese el apellido y nombre del cliente',
+            confirmButtonColor: '#ffc107'
+        });
+        return;
+    }
+    
+    // Mostrar loading
+    Swal.fire({
+        title: 'Buscando...',
+        text: 'Buscando presupuestos del cliente',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+    
+    fetch('/buscar_presupuestos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            apeynom: apeynom
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        Swal.close();
+        
+        if (data.encontrado) {
+            clienteActual = data.cliente;
+            mostrarCliente(data.cliente);
+            mostrarPresupuestos(data.presupuestos);
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'Cliente no encontrado',
+                text: 'No se encontró ningún cliente con ese nombre',
+                confirmButtonColor: '#17a2b8'
+            });
+            ocultarSecciones();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al buscar los presupuestos',
+            confirmButtonColor: '#dc3545'
+        });
+    });
+}
+
+function mostrarCliente(cliente) {
+    document.getElementById('clienteNombre').textContent = cliente.apeynom;
+    document.getElementById('clienteDireccion').textContent = cliente.direccion || '-';
+    document.getElementById('clienteLocalidad').textContent = cliente.localidad || '-';
+    document.getElementById('clienteTelefono').textContent = cliente.telefono || '-';
+    document.getElementById('clienteAseguradora').textContent = cliente.aseguradora || '-';
+    document.getElementById('clienteEmail').textContent = cliente.email || '-';
+    
+    document.getElementById('clienteInfo').style.display = 'block';
+}
+
+function mostrarPresupuestos(presupuestos) {
+    const container = document.getElementById('listaPresupuestos');
+    
+    if (Object.keys(presupuestos).length === 0) {
+        container.innerHTML = '<p class="text-muted">No se encontraron presupuestos para este cliente.</p>';
+        document.getElementById('presupuestosSection').style.display = 'block';
+        return;
+    }
+    
+    let html = '';
+    
+    Object.entries(presupuestos).forEach(([key, items]) => {
+        const [patente, fecha] = key.split(' - ');
+        const total = items.reduce((sum, item) => sum + parseFloat(item.importe), 0);
+        const primerItem = items[0];
+        
+        html += `
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">
+                            <i class="fas fa-car"></i> ${primerItem.marca} ${primerItem.modelo} - ${patente}
+                        </h6>
+                        <small class="text-muted">Fecha: ${fecha}</small>
+                    </div>
+                    <div class="text-end">
+                        <h6 class="mb-0 text-success">Total: $${total.toFixed(2)}</h6>
+                        <button class="btn btn-success btn-sm mt-1" 
+                                onclick="enviarPresupuesto('${patente}', '${fecha}')"
+                                ${!clienteActual.email ? 'disabled title="Cliente sin email"' : ''}>
+                            <i class="fas fa-envelope"></i> Enviar por Email
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Descripción</th>
+                                    <th class="text-end">Importe</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+        
+        items.forEach(item => {
+            html += `
+                <tr>
+                    <td>${item.parte}</td>
+                    <td class="text-end">$${parseFloat(item.importe).toFixed(2)}</td>
+                </tr>`;
+        });
+        
+        html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>`;
+    });
+    
+    container.innerHTML = html;
+    document.getElementById('presupuestosSection').style.display = 'block';
+}
+
+function enviarPresupuesto(patente, fecha) {
+    if (!clienteActual.email) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Email no disponible',
+            text: 'Este cliente no tiene un email registrado',
+            confirmButtonColor: '#ffc107'
+        });
+        return;
+    }
+    
+    Swal.fire({
+        title: '¿Enviar presupuesto?',
+        text: `Se enviará el presupuesto a: ${clienteActual.email}`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, enviar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Mostrar loading
+            Swal.fire({
+                title: 'Enviando email...',
+                text: 'Por favor espere mientras se envía el presupuesto',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            fetch('/enviar_presupuesto', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    cliente_id: clienteActual.id_cli,
+                    patente: patente,
+                    fecha: fecha
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Email enviado!',
+                        text: 'El presupuesto ha sido enviado correctamente',
+                        confirmButtonColor: '#28a745'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al enviar',
+                        text: data.message || 'Error desconocido',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al enviar el presupuesto',
+                    confirmButtonColor: '#dc3545'
+                });
+            });
+        }
+    });
+}
+
+function ocultarSecciones() {
+    document.getElementById('clienteInfo').style.display = 'none';
+    document.getElementById('presupuestosSection').style.display = 'none';
+}
+
+// Permitir buscar con Enter
+document.getElementById('apeynom').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        buscarPresupuestos();
+    }
+});
+</script>
+{% endblock %}
