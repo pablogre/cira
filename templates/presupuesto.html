@@ -64,7 +64,7 @@
                         </select>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3"">
+                        <div class="col-md-6 mb-3">
                             <label for="partes" class="form-label">Partes:</label>
                             <select class="form-select" name="partes" id="partes" required>
                                 <option value="">Seleccione...</option>
@@ -115,7 +115,7 @@
                             </select>
                         </div>
                         
-                        <div class="col-md-6 mb-3"">
+                        <div class="col-md-6 mb-3>
                             <label for="lateral" class="form-label">Lateral:</label>
                             <select class="form-select" name="lateral" id="lateral">
                                 <option value="">Seleccione...</option>
@@ -432,10 +432,117 @@ function imprimirPresupuesto() {
     const clienteNombre = document.getElementById("cliente_nombre").textContent;
     const clienteTelefono = document.getElementById("cliente_telefono").textContent;
     const clienteEmail = document.getElementById("cliente_email").textContent;
+
+    const marca = document.getElementById("marca").value;
+    const modelo = document.getElementById("modelo").value;
+    const patente = document.getElementById("patente").value;
+
     const totalPresupuesto = document.getElementById("totalPresupuesto").textContent;
 
     const tablaOriginal = document.getElementById("grilla_items");
     const tablaClon = tablaOriginal.cloneNode(true);
+
+    // Identificar índices de columnas a eliminar: Fecha y Vehículo
+    const encabezados = tablaClon.rows[0];
+    let indexFecha = -1;
+    let indexVehiculo = -1;
+
+    for (let i = 0; i < encabezados.cells.length; i++) {
+        const texto = encabezados.cells[i].textContent.trim().toLowerCase();
+        if (texto === "fecha") indexFecha = i;
+        if (texto === "vehículo" || texto === "vehiculo") indexVehiculo = i;
+    }
+
+    // Eliminar columnas Fecha y Vehículo y columna "Acciones"
+    tablaClon.querySelectorAll("tr").forEach(row => {
+        if (indexVehiculo !== -1 && row.cells.length > indexVehiculo) {
+            row.deleteCell(indexVehiculo);
+        }
+        if (indexFecha !== -1 && row.cells.length > indexFecha) {
+            row.deleteCell(indexFecha);
+        }
+        if (row.cells.length > 0) {
+            row.deleteCell(-1);  // Elimina última celda (Acciones)
+        }
+    });
+
+    // Insertar fila "Más daños a verificar"
+    const totalColumnas = tablaClon.rows[0].cells.length;
+    const filaExtra = tablaClon.insertRow();
+    const celdaExtra = filaExtra.insertCell(0);
+    celdaExtra.colSpan = totalColumnas;
+    celdaExtra.textContent = "Más daños a verificar";
+    celdaExtra.style.fontWeight = "bold";
+    celdaExtra.style.fontStyle = "italic";
+    celdaExtra.style.textAlign = "center";
+
+    // Agregar fila de Total
+    const nuevaFila = tablaClon.insertRow();
+    const celdaLabel = nuevaFila.insertCell(0);
+    celdaLabel.colSpan = totalColumnas - 1;
+    celdaLabel.textContent = "TOTAL:";
+    celdaLabel.style.fontWeight = "bold";
+
+    const celdaTotal = nuevaFila.insertCell(1);
+    celdaTotal.textContent =  totalPresupuesto;
+    celdaTotal.style.fontWeight = "bold";
+
+    const grillaHTML = tablaClon.innerHTML;
+
+    const ventana = window.open('', '_blank');
+    ventana.document.write(`
+        <html>
+        <head>
+            <title>Presupuesto</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .logo { width: 150px; }
+                h2, h4 { margin-bottom: 5px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                table, th, td { border: 1px solid black; }
+                th, td { padding: 8px; text-align: left; }
+                .contacto { margin-top: 10px; font-size: 14px; }
+            </style>
+        </head>
+        <body>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <img src="/static/images/logo_cira.png" alt="Logo CIRA" class="logo">
+                <h2 style="margin: 0;">Presupuesto</h2>
+            </div>
+            <div class="contacto">Urquiza 385 - Tel: 0336-4661335 - Email: cirasrl@hotmail.com</div>
+            <hr style="margin: 15px 0; border: 1px solid #000;">
+            <h4>Cliente: ${clienteNombre}</h4>
+            <h4>Teléfono: ${clienteTelefono}</h4>
+            <h4>Email: ${clienteEmail}</h4>
+            <h4>Fecha: ${new Date().toLocaleDateString()}</h4>
+            <h4>Vehículo: ${marca} ${modelo} - Patente: ${patente}</h4>
+            <table>${grillaHTML}</table>
+        </body>
+        </html>
+    `);
+    ventana.document.close();
+    ventana.print();
+}
+
+
+
+
+/* 
+function imprimirPresupuesto() {
+    const clienteNombre = document.getElementById("cliente_nombre").textContent;
+    const clienteTelefono = document.getElementById("cliente_telefono").textContent;
+    const clienteEmail = document.getElementById("cliente_email").textContent;
+    const totalPresupuesto = document.getElementById("totalPresupuesto").textContent;
+    const marca = document.getElementById("marca").textContent;
+    const modelo = document.getElementById("modelo").textContent;
+    const patente = document.getElementById("patente").textContent;
+    const vehiculo = `${marca} ${modelo} - ${patente}`;
+
+
+
+    const tablaOriginal = document.getElementById("grilla_items");
+    const tablaClon = tablaOriginal.cloneNode(true);
+    
 
     // Eliminar la columna de "Acciones"
     tablaClon.querySelectorAll("tr").forEach(row => {
@@ -470,12 +577,17 @@ function imprimirPresupuesto() {
                 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                 table, th, td { border: 1px solid black; }
                 th, td { padding: 8px; text-align: left; }
+                .datos-contacto { font-size: 12px; margin-top: 8px; }
             </style>
         </head>
         <body>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <img src="/static/images/logo_cira.png" alt="Logo CIRA" class="logo">
+               <div>
+                    <img src="/static/images/logo_cira.png" alt="Logo CIRA" class="logo">
+                    <div class="datos-contacto">Urquiza 385 - Tel: 0336-4661335 - Email: cirasrl@hotmail.com</div>
+                </div>
                 <h2 style="margin: 0;">Presupuesto</h2>
+
             </div>
             <hr style="margin: 15px 0; border: 1px solid #000;">
             <h4>Cliente: ${clienteNombre}</h4>
@@ -488,7 +600,7 @@ function imprimirPresupuesto() {
     `);
     ventana.document.close();
     ventana.print();
-}
+} */
 </script>
 
 
