@@ -69,17 +69,32 @@
                             <select class="form-select" name="partes" id="partes" required>
                                 <option value="">Seleccione...</option>
                                 <option value="Baúl / Tapa de baúl">Baúl / Tapa de baúl</option>
+                                <option value="Burlete Puerta delantera">Burlete Puerta delantera</option>
+                                <option value="Burlete Puerta trasera">Burlete Puerta trasera</option>
                                 <option value="Capot">Capot</option>
                                 <option value="Condesador">Condesador</option>
+                                <option value="Cristal puerta delantera">Cristal puerta delantera</option>
+                                <option value="Cristal puerta trasera">Cristal puerta trasera</option>
                                 <option value="Espejo Retrovisor">Espejo Retrovisor</option>
                                 <option value="Faro Trasero">Faro Trasero</option>
                                 <option value="Guardabarro Delantero">Guardabarro Delantero</option>
                                 <option value="Guardabarro trasero">Guardabarro Trasero</option>
-                                <option value="Guardapolvo Interno">Guardapolvo Interno</option>
+                                <option value="Guardplast de guardabarro delantero">Guardplast de guardabarro delantero</option>
+                                <option value="Guardplast de guardabarro trasero">Guardplast de guardabarro trasero</option>
+                                <option value="Luneta">Luneta</option>
                                 <option value="Manija de Puerta">Manija de Puerta</option>
+                                <option value="Media Coliza exterior puerta delantera">Media Coliza exterior puerta delantera</option>
+                                <option value="Media Coliza exterior puerta trasera">Media Coliza exterior puerta trasera</option>
+                                <option value="Moldura de paragolpe delantero">Moldura de paragolpe delantero</option>
+                                <option value="Moldura de paragolpe trasero">Moldura de paragolpe trasero</option>
+                                <option value="Moldura de puerta delantera">Moldura de puerta delantera</option>
+                                <option value="Moldura de puerta trasera">Moldura de puerta trasera</option>
+                                <option value="Moldura inferior de paragolpe delantero">Moldura inferior de paragolpe delantero</option>
+                                <option value="Moldura inferior de paragolpe trasero">Moldura inferior de paragolpe trasero</option>
                                 <option value="Óptica Delantera">Óptica Delantera</option>
-                                <option value="Paragolpes Delantero">Paragolpes Delantero</option>
-                                <option value="Paragolpes Trasero">Paragolpes Trasero</option>
+                                <option value="Paragolpe Delantero">Paragolpe Delantero</option>
+                                <option value="Paragolpe Trasero">Paragolpe Trasero</option>
+                                <option value="Parante de techo">Parante de techo</option>
                                 <option value="Parrilla Frontal">Parrilla Frontal</option>
                                 <option value="Pilar A">Pilar A</option>
                                 <option value="Pilar B">Pilar B</option>
@@ -92,6 +107,8 @@
                                 <option value="Rompe niebla Delantero">Rompe niebla Delantero</option>
                                 <option value="Rompe niebla Trasero">Rompe niebla Trasero</option>
                                 <option value="Socalo">Socalo</option>
+                                <option value="Soporte de paragolpe delantero">Soporte de paragolpe delantero</option>
+                                <option value="Soporte de paragolpe trasero">Soporte de paragolpe trasero</option>
                                 <option value="Tapa de Combustible">Tapa de Combustible</option>
                                 <option value="Techo">Techo</option>
                                 <option value="Zócalo">Zócalo</option>
@@ -369,7 +386,20 @@ function manejarEnvioFormulario(event) {
             // Actualiza tabla tras agregar
             actualizarPresupuestos();
             // Opcional: limpiar campos o reset form
-            document.getElementById("presupuestoForm").reset();
+            //document.getElementById("presupuestoForm").reset();
+            // 💡 Esta parte reemplaza al reset:
+            const marca = document.getElementById("marca").value;
+            const modelo = document.getElementById("modelo").value;
+            const patente = document.getElementById("patente").value;
+
+            document.getElementById("accion").value = "";
+            document.getElementById("partes").value = "";
+            document.getElementById("lateral").value = "";
+            document.getElementById("importe").value = "";
+
+            document.getElementById("marca").value = marca;
+            document.getElementById("modelo").value = modelo;
+            document.getElementById("patente").value = patente;
         } else {
             Swal.fire('Error', data.error, 'error');
         }
@@ -460,4 +490,6 @@ function imprimirPresupuesto() {
     ventana.print();
 }
 </script>
+
+
 {% endblock %}

@@ -25,13 +25,14 @@ DB_CONFIG = {
     'autocommit': True
 }
 
-# Configuración de email
+# Configuración de email para gmail cira385srl@gmail.com pass:2605%cira contraseña de app: uqrh qyzu pphr iaoz
 EMAIL_CONFIG = {
     'smtp_server': 'smtp.gmail.com',
     'smtp_port': 587,
-    'email': 'pablogustavore@gmail.com',
-    'password': 'hobpghjqqvlpgiba'
-}
+    'email': 'cira385srl@gmail.com',
+    'password': 'uqrh qyzu pphr iaoz'
+} 
+
 
 def get_db_connection():
     """Establece conexión con la base de datos con manejo de errores"""
@@ -200,8 +201,14 @@ def generar_html_presupuesto(cliente_nombre, patente, fecha, items, total):
             <td style="padding: 8px; border-bottom: 1px solid #ddd;">{item['parte']}</td>
             <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item['importe']:.2f}</td>
         </tr>
-        """
-    
+    """
+    # Fila adicional al final
+    items_html += """
+        <tr>
+            <td colspan="2" style="padding: 8px; font-style: italic; color: #555;">Más daños a verificar</td>
+        </tr>
+    """
+
     html = f"""
     <!DOCTYPE html>
     <html>
@@ -226,7 +233,15 @@ def generar_html_presupuesto(cliente_nombre, patente, fecha, items, total):
                         <img src="cid:logo_cira" alt="Logo CIRA" style="width: 200px;">
                     </td>
                     <td style="text-align: left;">
-                        <h5 style="margin: 0; font-size: 24px;">PRESUPUESTO AUTOMOTOR</h5>
+                        <h5 style="margin: 0; font-size: 14px;">PRESUPUESTO AUTOMOTOR</h5>
+                        <p style="margin: 0; font-size: 12px;">Dirección: Urquiza 385</p>
+                        <p style="margin: 0; font-size: 12px;">Tel: 3364661335</p>
+                        <p style="margin: 0; font-size: 12px;">
+                        <p style="margin: 0; font-size: 12px;">
+                            email: <a href="mailto:cirasrl@hotmail.com" style="color: white; text-decoration: none;">cirasrl@hotmail.com</a>
+                        </p>
+
+                    </p>
                     </td>
                 </tr>
             </table>
