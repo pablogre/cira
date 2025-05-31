@@ -89,6 +89,40 @@ def crear_cliente(datos):
         logger.error(f"Error creando cliente: {e}")
         raise
 
+def actualizar_cliente(id_cliente, datos):
+    """Actualiza los datos de un cliente existente"""
+    print("actualizar clientes")
+    print(datos)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        query = """
+            UPDATE cliente
+            SET direccion = %s,
+                localidad = %s,
+                telefono = %s,
+                aseguradora = %s,
+                email = %s
+            WHERE id_cli = %s
+        """
+        cursor.execute(query, (
+            datos['direccion'],
+            datos['localidad'],
+            datos['telefono'],
+            datos['aseguradora'],
+            datos['email'],
+            id_cliente
+        ))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        logger.error(f"Error actualizando cliente: {e}")
+        raise
+
+
 def eliminar_presupuesto(id_presu):
     """Elimina un item del presupuesto"""
     try:
@@ -349,11 +383,14 @@ def procesar_formulario():
     """Procesa el formulario principal"""
     try:
         datos = request.form.to_dict()
+        datos = {k: v.upper() for k, v in datos.items()}  # Solo convierte los valores en mayúsculas
+
         cliente = buscar_cliente(datos['apeynom'])
         
         if not cliente:
             id_cliente = crear_cliente(datos)
         else:
+            actualizar_cliente(cliente['id_cli'], datos)
             id_cliente = cliente['id_cli']
         
         return redirect(url_for('presupuesto', id_cli=id_cliente))
