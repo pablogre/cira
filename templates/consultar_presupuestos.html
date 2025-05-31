@@ -232,6 +232,7 @@ function mostrarPresupuestos(presupuestos) {
 }
 
 function enviarPresupuesto(patente, fecha) {
+    console.log("fecha:", fecha)
     if (!clienteActual.email) {
         Swal.fire({
             icon: 'warning',
@@ -241,7 +242,8 @@ function enviarPresupuesto(patente, fecha) {
         });
         return;
     }
-    
+
+   
     Swal.fire({
         title: '¿Enviar presupuesto?',
         text: `Se enviará el presupuesto a: ${clienteActual.email}`,
@@ -268,6 +270,7 @@ function enviarPresupuesto(patente, fecha) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                
                 body: JSON.stringify({
                     cliente_id: clienteActual.id_cli,
                     patente: patente,

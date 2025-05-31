@@ -537,7 +537,16 @@ def enviar_presupuesto():
         cliente_id = data.get('cliente_id')
         patente = data.get('patente')
         fecha = data.get('fecha')
-        
+        print("Fecha recibida:", fecha)
+
+        # Convertir fecha de 'dd/mm/yyyy' a 'yyyy-mm-dd' para SQL
+        from datetime import datetime
+        try:
+            fecha_obj = datetime.strptime(fecha, '%d/%m/%Y')
+            fecha_sql = fecha_obj.strftime('%Y-%m-%d')  # Formato compatible con SQL
+        except ValueError:
+            return jsonify({'success': False, 'error': 'Formato de fecha inválido'}), 400
+
         if not all([cliente_id, patente, fecha]):
             return jsonify({'success': False, 'error': 'Datos incompletos'}), 400
         
@@ -553,7 +562,7 @@ def enviar_presupuesto():
             SELECT * FROM presupuesto 
             WHERE id_cli = %s AND patente = %s AND DATE(fecha) = %s
             ORDER BY fecha
-        """, (cliente_id, patente, fecha))
+        """, (cliente_id, patente, fecha_sql))
         items = cursor.fetchall()
         
         cursor.close()
