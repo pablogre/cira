@@ -376,12 +376,45 @@ function imprimirPresupuesto(boton) {
                 th, td { padding: 8px; text-align: left; }
                 td.text-end { text-align: right; }
                 .contacto { margin-top: 10px; font-size: 14px; }
+                .datos-fiscales {
+                    border: 1px solid #ccc;
+                    border-radius: 10px;
+                    padding: 10px 20px;
+                    width: 300px;
+                    margin-top: 5px; /* menos espacio arriba */
+                    margin-bottom: 20px;
+                    margin-left: auto;
+                    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+                    text-align: right;
+                    font-size: 12px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                }
+                .fila-dato {
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 12px;
+                }
+                .fila-dato .label {
+                    text-align: left;
+                    font-weight: bold;
+                }
+                .fila-dato .valor {
+                    text-align: right;
+                }
             </style>
         </head>
         <body>
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <img src="/static/images/logo_cira.png" alt="Logo CIRA" class="logo">
                 <h2 style="margin: 0;">Presupuesto</h2>
+            </div>
+            <div class="datos-fiscales">
+                <div class="fila-dato"><span class="label">CUIT:</span><span class="valor">30-70047456-3</span></div>
+                <div class="fila-dato"><span class="label">ING. BRUTOS:</span><span class="valor">30-70047456-3</span></div>
+                <div class="fila-dato"><span class="label">MUNICIPAL:</span><span class="valor">4536</span></div>
+                <div class="fila-dato"><span class="label">FECHA INICIO ACT. :</span><span class="valor">01/03/2008</span></div>
             </div>
             <div class="contacto">Urquiza 385 - Tel: 0336-4661335 - Email: cirasrl@hotmail.com</div>
             <hr style="margin: 15px 0; border: 1px solid #000;">
