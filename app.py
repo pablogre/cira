@@ -449,8 +449,12 @@ def agregar_item():
 
         if not datos:
             return jsonify({'success': False, 'error': 'No se recibieron datos JSON'}), 400
+        
+        # Si item no está vacío, reemplaza el valor de partes
+        if datos.get('item'):
+            datos['partes'] = datos['item']
 
-        campos_requeridos = ['id_cli', 'marca', 'modelo', 'patente', 'accion', 'partes', 'importe']
+        campos_requeridos = ['id_cli', 'marca', 'modelo', 'patente', 'accion', 'partes']
         for campo in campos_requeridos:
             if not datos.get(campo):
                 return jsonify({'success': False, 'error': f'Campo {campo} es requerido'}), 400

@@ -56,17 +56,18 @@
                         <label for="accion" class="form-label">Acción:</label>
                         <select class="form-select" name="accion" id="accion" required>
                             <option value="">Seleccione...</option>
-                            <option value="Desarrollar">Desarrollar</option>
-                            <option value="Desarrollar y Pintar">Desarrollar y Pintar</option>
+                            <option value="Desarrollar">Desabollar</option>
+                            <option value="Desarrollar y Pintar">Desabollar y Pintar</option>
                             <option value="Cambiar">Cambiar</option>
                             <option value="Cambiar y Pintar">Cambiar y Pintar</option>
+                            <option value="Reparar y Pintar">Reparar y Pintar</option>
                             <option value="Pintar">Pintar</option>
                         </select>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="partes" class="form-label">Partes:</label>
-                            <select class="form-select" name="partes" id="partes" required>
+                            <select class="form-select" name="partes" id="partes">
                                 <option value="">Seleccione...</option>
                                 <option value="Baúl / Tapa de baúl">Baúl / Tapa de baúl</option>
                                 <option value="Burlete Puerta delantera">Burlete Puerta delantera</option>
@@ -114,8 +115,7 @@
                                 <option value="Zócalo">Zócalo</option>
                             </select>
                         </div>
-                        
-                        <div class="col-md-6 mb-3>
+                        <div class="col-md-6 mb-3">
                             <label for="lateral" class="form-label">Lateral:</label>
                             <select class="form-select" name="lateral" id="lateral">
                                 <option value="">Seleccione...</option>
@@ -125,8 +125,12 @@
                         </div>
                     </div>
                     <div class="mb-3">
+                        <label for="marca" class="form-label">Item:</label>
+                        <input type="text" class="form-control uppercase" name="item" id="item">
+                    </div>
+                    <div class="mb-3">
                         <label for="importe" class="form-label">Importe:</label>
-                        <input type="number" class="form-control" name="importe" id="importe" step="1000" min="0" required>
+                        <input type="number" class="form-control" name="importe" id="importe" step="1000" min="0">
                     </div>
                     
                     <button type="submit" class="btn btn-success">Agregar Item</button>
@@ -328,10 +332,14 @@ function eliminarItem(id_presu) {
 // Evento para agregar item
 function manejarEnvioFormulario(event) {
     event.preventDefault();
-
+   
     const form = event.target;
     const formData = new FormData(form);
-    const requiredFields = ['marca', 'modelo', 'patente', 'accion', 'partes', 'importe'];
+
+    const partes = document.getElementById("partes").value.trim();
+    const item = document.getElementById("item").value.trim();
+   
+    const requiredFields = ['marca', 'modelo', 'patente', 'accion'];
 
     for (let field of requiredFields) {
         if (!formData.get(field) || formData.get(field).trim() === '') {
@@ -345,7 +353,23 @@ function manejarEnvioFormulario(event) {
         }
     }
 
-    const importe = parseFloat(formData.get('importe'));
+
+    if (partes === "" && item === "") {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campo requerido',
+            text: 'Debe completar una parte o escribir un ítem',
+            confirmButtonColor: '#ffc107'
+        });
+        return;
+    }
+
+    let importe = document.getElementById("importe").value.trim();
+    if (importe === "") {
+        importe = "0";
+    }
+    /* SACO LA VALIDACION DEL IMPORTE >= 0  */
+    /* const importe = parseFloat(formData.get('importe'));
     if (isNaN(importe) || importe <= 0) {
         Swal.fire({
             icon: 'warning',
@@ -354,7 +378,7 @@ function manejarEnvioFormulario(event) {
             confirmButtonColor: '#ffc107'
         });
         return;
-    }
+    } */
 
     Swal.fire({
         title: 'Agregando item...',
@@ -374,9 +398,10 @@ function manejarEnvioFormulario(event) {
             modelo: document.getElementById("modelo").value,
             patente: document.getElementById("patente").value,
             accion: document.getElementById("accion").value,
-            partes: document.getElementById("partes").value,
+            partes: partes,
+            item: item,
             lateral: document.getElementById("lateral").value,
-            importe: document.getElementById("importe").value
+            importe: importe
         })
     })
     .then(response => response.json())
@@ -396,7 +421,8 @@ function manejarEnvioFormulario(event) {
             document.getElementById("partes").value = "";
             document.getElementById("lateral").value = "";
             document.getElementById("importe").value = "";
-
+            document.getElementById("item").value = "";
+            
             document.getElementById("marca").value = marca;
             document.getElementById("modelo").value = modelo;
             document.getElementById("patente").value = patente;
